@@ -51,24 +51,26 @@ class Window(QtWidgets.QWidget, Ui_Form):
 
 
     def on_pushButtonCenter_clicked(self):
-        self.setupUi()
+        self.move(421, 247)
 
 
     def on_pushButtonLB_clicked(self):
-        self.setupUi()
+        self.move(0, 460)
 
     def on_pushButtonRB_clicked(self):
-        self.setupUi()
+        self.move(837, 460)
 
 
     def on_pushButtonLT_clicked(self):
-        self.setupUi()
+        self.move(0, 0)
 
     def on_pushButtonRT_clicked(self):
-        self.setupUi()
+        self.move(837, 0)
 
     def on_pushButtonMoveCoords_clicked(self):
-        self.setupUi()
+        x = int(self.spinBoxX.text())
+        y = int(self.spinBoxY.text())
+        self.move(x, y)
 
     def Screen_Params(self):
         text = ''
