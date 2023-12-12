@@ -103,7 +103,10 @@ class Window(QtWidgets.QWidget, Ui_Form):
         # * Координаты центра приложения
 
         # * Отслеживание состояния окна (свернуто/развёрнуто/активно/отображено)"
-        status = self.window().statusTip()
+        if self.window().isActiveWindow():
+            status = "Окно активно"
+        else:
+            status = "Окно не активно"
         text += 'Текущее состояние окна >>> ' + str(status) + '\n'
 
 
