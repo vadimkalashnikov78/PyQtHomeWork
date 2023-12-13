@@ -79,37 +79,50 @@ class Window(QtWidgets.QWidget, Ui_Form):
         screens = app.screens()
         text += 'Количество экранов равно >>>  ' + str(len(screens)) + '\n'
         # * Текущее основное окно
-        current_win = '1'
+        current_win = QtGui.QGuiApplication.focusWindow().objectName()
 
-        text += 'Текущее основное окно >>>  ' + current_win + '\n'
-
+        text += 'Текущее основное окно >>>  ' + str(current_win) + '\n'
 
         # * Разрешение экрана
+        width, height = QtGui.QGuiApplication.primaryScreen().size().toTuple()
 
-
-
+        text += 'Текущее разрешение экрана >>>  ' + str(width) + ' на ' + str(height) + ' пикселей' + '\n'
 
         # * На каком экране окно находится
+        screen = QtGui.QGuiApplication.primaryScreen().name()
+
+        text += 'Текущий экран >>>  ' + str(screen) + '\n'
 
         # * Размеры окна
-        current_size = self.size()
+        current_size = QtGui.QGuiApplication.focusWindow().size().toTuple()
         text += 'Размеры окна >>>  ' + str(current_size) + '\n'
+
         # * Минимальные размеры окна
-        min_size = self.minimumSize()
+        min_size = QtGui.QGuiApplication.focusWindow().minimumSize().toTuple()
         text += 'Минимальные размеры окна >>>  ' + str(min_size) + '\n'
 
         # * Текущее положение (координаты) окна
-        coords = self.geometry()
+        coords = QtGui.QGuiApplication.focusWindow().geometry().getCoords()
         text += 'Текущее положение (координаты) окна >>> ' + str(coords) + '\n'
 
         # * Координаты центра приложения
+        position = QtGui.QGuiApplication.focusWindow().position().toTuple()
+        size = QtGui.QGuiApplication.focusWindow().size().toTuple()
+        x = int(round(size[0] / 2 + position[0], 0))
+        y = int(round(size[1] / 2 + position[1], 0))
+        text += 'Координаты центра приложения >>> ' + str(x) + ' x ' + str(y) + '\n'
 
         # * Отслеживание состояния окна (свернуто/развёрнуто/активно/отображено)"
-        if self.window().isActiveWindow():
-            status = "Окно активно"
-        else:
-            status = "Окно не активно"
-        text += 'Текущее состояние окна >>> ' + str(status) + '\n'
+        status = ''
+        if QtGui.QGuiApplication.focusWindow().isActive():
+            status += "Окно активно\n"
+        if QtGui.QGuiApplication.focusWindow().isVisible():
+            status += "Окно отображено\n"
+        if QtGui.QGuiApplication.focusWindow().isExposed():
+            status += "Окно развёрнуто\n"
+        if QtGui.QGuiApplication.focusWindow().isModal():
+            status = "Окно свёрнуто\n"
+        text += 'Текущее состояние окна >>> \n' + str(status) + '\n'
 
 
         self.plainTextEdit.setPlainText(text)
@@ -126,6 +139,7 @@ class Window(QtWidgets.QWidget, Ui_Form):
 
     def moveEvent(self, event: QtGui.QMoveEvent) -> None:
         """
+        событие перемещения окна
         :param event: QtGui
         :param event:
         :return:
