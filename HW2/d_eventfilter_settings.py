@@ -75,13 +75,15 @@ class Window(QtWidgets.QWidget, Ui_Form):
         """
         self.lcdNumber.setDecMode()
 
-    # def event_key(self, event):
-    #     if event.type() == QtCore.QEvent.Type.KeyPress:
-    #         if event.key() == "+":
-    #             self.lcdNumber.text += event.delta()
-    #         elif event.key() == "-":
-    #             horizontalSlider.value() -= event.delta()
-
+    def event_key(self, event):
+            if event.key() == QtGui.QKeyEvent.Key_Plus:
+                pos0 = self.horizontalSlider.pos()
+                pos0 += 1
+                self.horizontalSlider.setSliderPosition(pos0)
+            elif event.key() == QtGui.QKeyEvent.Key_Minus:
+                pos1 = self.horizontalSlider.pos()
+                pos1 -= 1
+                self.horizontalSlider.setSliderPosition(pos1)
 
     def closeEvent(self, event):
         self.settings.setValue("settings", [self.comboBox.windowModality(), self.lcdNumber.value()]
