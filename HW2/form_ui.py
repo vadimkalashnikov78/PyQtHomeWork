@@ -42,6 +42,7 @@ class Ui_Form(object):
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.comboBox = QComboBox(Form)
         self.comboBox.setObjectName(u"comboBox")
+        self.comboBox.addItems(["bin", "oct", "dec", "hex"])
 
         self.verticalLayout.addWidget(self.comboBox)
 

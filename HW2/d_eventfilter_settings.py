@@ -21,7 +21,6 @@
 import time
 
 from PySide6 import QtWidgets, QtCore
-
 from form_ui import Ui_Form
 
 
@@ -29,8 +28,6 @@ class Window(QtWidgets.QWidget, Ui_Form):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-
-        self.settings = QtCore.QSettings("Settings")
 
         self.setupUi(self)
         self.installEventFilter(self)
@@ -40,9 +37,18 @@ class Window(QtWidgets.QWidget, Ui_Form):
         self.horizontalSlider.setSliderPosition(0)
         self.comboBox.setItemData(0, "dec")
 
+        self.__load()
 
-        settings1 = self.settings.value("settings", [])
-        print(settings1)
+    def __load(self):
+        settings = QtCore.QSettings("MyFormSettings")
+        setts = settings.value("settings")
+        print(setts)
+        self.lcdNumber.display(setts[0])
+        self.comboBox.setCurrentText(setts[1])
+
+    def __save(self):
+        settings = QtCore.QSettings("MyFormSettings")
+        settings.setValue("settings", [self.lcdNumber.value(), self.comboBox.currentText()])
 
     def eventFilter(self, watched: QtWidgets.QWidget, event: QtCore.QEvent) -> bool:
         print(time.ctime(), ">>>", event, ">>>", watched.objectName())
@@ -50,45 +56,56 @@ class Window(QtWidgets.QWidget, Ui_Form):
         return super().eventFilter(watched, event)
 
     def initSignals(self):
-        self.dial.rangeChanged.connect(self.onDialRangeChanged)
-        self.horizontalSlider.rangeChanged.connect(self.onHorizontalSliderRangeChanged)
-        self.comboBox.currentTextChanged.connect(self.onComboBoxTextChanged)
+        self.dial.sliderReleased.connect(self.onDialSliderReleased)
+        self.horizontalSlider.sliderReleased.connect(self.onHorizontalSliderReleased)
+        self.comboBox.currentTextChanged.connect(self.onComboBoxCurrentTextChanged)
 
-    def onDialRangeChanged(self):
+    def onDialSliderReleased(self):
         """
 
         :return:
         """
-        self.lcdNumber.setText(self.dial.value())
+        self.horizontalSlider.setSliderPosition(self.dial.sliderPosition())
+        self.lcdNumber.display(self.dial.sliderPosition())
 
-    def onHorizontalSliderRangeChanged(self):
+    def onHorizontalSliderReleased(self):
         """
 
         :return:
         """
-        self.lcdNumber.setValue(self.horizontalSlider.value())
+        self.dial.setSliderPosition(self.horizontalSlider.sliderPosition())
+        self.lcdNumber.display(self.horizontalSlider.value())
 
-    def onComboBoxTextChanged(self):
+    def onComboBoxCurrentTextChanged(self):
         """
 
         :return:
         """
-        self.lcdNumber.setDecMode()
+        if self.comboBox.currentText() == "bin":
+            self.lcdNumber.setBinMode()
+        if self.comboBox.currentText() == "oct":
+            self.lcdNumber.setOctMode()
+        if self.comboBox.currentText() == "dec":
+            self.lcdNumber.setDecMode()
+        if self.comboBox.currentText() == "hex":
+            self.lcdNumber.setHexMode()
 
-    def event_key(self, event):
-            if event.key() == QtGui.QKeyEvent.Key_Plus:
-                pos0 = self.horizontalSlider.pos()
-                pos0 += 1
-                self.horizontalSlider.setSliderPosition(pos0)
-            elif event.key() == QtGui.QKeyEvent.Key_Minus:
-                pos1 = self.horizontalSlider.pos()
-                pos1 -= 1
-                self.horizontalSlider.setSliderPosition(pos1)
+    def keyPressEvent(self, event):
+        if event.text() == "+":
+            n1 = self.horizontalSlider.sliderPosition()
+            n1 += 1
+            self.horizontalSlider.setSliderPosition(n1)
+            self.lcdNumber.display(n1)
+            self.dial.setSliderPosition(n1)
+        if event.text() == "-":
+            n2 = self.horizontalSlider.sliderPosition()
+            n2 -= 1
+            self.horizontalSlider.setSliderPosition(n2)
+            self.lcdNumber.display(n2)
+            self.dial.setSliderPosition(n2)
 
     def closeEvent(self, event):
-        self.settings.setValue("settings", [self.comboBox.windowModality(), self.lcdNumber.value()]
-                               )
-
+        self.__save()
 
 
 if __name__ == "__main__":
