@@ -42,6 +42,7 @@ class SystemInfoForm(QtWidgets.QWidget, Ui_Form):
         :return:
         """
         self.thread.started.connect(self.worker.start)
+        self.thread.
         # self.lineEdit.textChanged.connect(self.onTextChanged)
 
 
