@@ -10,7 +10,7 @@ from PySide6.QtCore import Signal
 
 
 class SystemInfo(QtCore.QThread):
-    systemInfoReceived = Signal(list)  # TODO Создайте экземпляр класса Signal и передайте ему в конструктор тип данных передаваемого значения (в текущем случае list)
+    systemInfoReceived = Signal(list[float])
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -20,12 +20,13 @@ class SystemInfo(QtCore.QThread):
         if self.delay is None:
             self.delay = 1
 
-        while True:  # TODO Запустите бесконечный цикл получения информации о системе
+        while True:
             cpu_value = psutil.cpu_percent(1, False)
             ram_value = psutil.virtual_memory().percent
-            self.__class__.systemInfoReceived.emit(cpu_value, ram_value)  # TODO с помощью метода .emit передайте в виде списка данные о загрузке CPU и RAM
+            print(cpu_value, ram_value)
+            list_signal = [cpu_value, ram_value]
+            self.systemInfoReceived.emit(list_signal)
             time.sleep(self.delay)
-            print("CPU Value: ", cpu_value)
 
 
 class WeatherHandler(QtCore.QThread):

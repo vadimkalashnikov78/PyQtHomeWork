@@ -13,17 +13,18 @@
 """
 import psutil
 from PySide6 import QtWidgets, QtCore
-from form1 import Ui_Form
+from form2 import Ui_Form
 from a_threads import SystemInfo
 
 
-class SystemInfoForm(QtWidgets.QWidget, Ui_Form):
+class SystemInfoForm(QtWidgets.QWidget, Ui_Form, SystemInfo):
     def __init__(self, parent=None):
         super().__init__(parent)
 
         self.initThreads()
         self.setupUi(self)
         self.initSignals()
+        print(self.systemInfoReceived)
 
     def initThreads(self) -> None:
         """
@@ -33,6 +34,8 @@ class SystemInfoForm(QtWidgets.QWidget, Ui_Form):
         self.thread = QtCore.QThread()
         self.worker = SystemInfo()
         self.worker.moveToThread(self.thread)
+        self.worker.start()
+
 
 
 
@@ -41,8 +44,8 @@ class SystemInfoForm(QtWidgets.QWidget, Ui_Form):
 
         :return:
         """
-        self.thread.started.connect(self.worker.start)
-        self.thread.
+        self.worker.started.connect(self.onProgress)
+
         # self.lineEdit.textChanged.connect(self.onTextChanged)
 
 
@@ -54,13 +57,12 @@ class SystemInfoForm(QtWidgets.QWidget, Ui_Form):
         :return:
         """
 
-    def progress(self):
+    def onProgress(self):
         """
 
         :return:
         """
-        self.lcdNumber.display(psutil.cpu_percent(1, False))
-        self.lcdNumber_2.display(psutil.virtual_memory().percent)
+        print("Информация получена")
 
 
 if __name__ == "__main__":
