@@ -12,7 +12,7 @@
 реагировать на изменение времени задержки
 """
 import psutil
-from PySide6 import QtWidgets
+from PySide6 import QtWidgets, QtCore
 from form1 import Ui_Form
 from a_threads import SystemInfo
 
@@ -21,8 +21,19 @@ class SystemInfoForm(QtWidgets.QWidget, Ui_Form):
     def __init__(self, parent=None):
         super().__init__(parent)
 
+        self.initThreads()
         self.setupUi(self)
         self.initSignals()
+
+    def initThreads(self) -> None:
+        """
+
+        :return:
+        """
+        self.thread = QtCore.QThread()
+        self.worker = SystemInfo()
+        self.worker.moveToThread(self.thread)
+
 
 
     def initSignals(self):
@@ -30,11 +41,11 @@ class SystemInfoForm(QtWidgets.QWidget, Ui_Form):
 
         :return:
         """
-        self.lineEdit.textChanged.connect(self.onTextChanged)
-        self.progress()
+        self.thread.started.connect(self.worker.start)
+        # self.lineEdit.textChanged.connect(self.onTextChanged)
 
 
-
+    # слоты
 
     def onTextChanged(self):
         """
@@ -47,8 +58,8 @@ class SystemInfoForm(QtWidgets.QWidget, Ui_Form):
 
         :return:
         """
-            self.lcdNumber.display(psutil.cpu_percent(1, False))
-            self.lcdNumber_2.display(psutil.virtual_memory().percent)
+        self.lcdNumber.display(psutil.cpu_percent(1, False))
+        self.lcdNumber_2.display(psutil.virtual_memory().percent)
 
 
 if __name__ == "__main__":

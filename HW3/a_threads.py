@@ -25,6 +25,7 @@ class SystemInfo(QtCore.QThread):
             ram_value = psutil.virtual_memory().percent
             self.__class__.systemInfoReceived.emit(cpu_value, ram_value)  # TODO с помощью метода .emit передайте в виде списка данные о загрузке CPU и RAM
             time.sleep(self.delay)
+            print("CPU Value: ", cpu_value)
 
 
 class WeatherHandler(QtCore.QThread):
