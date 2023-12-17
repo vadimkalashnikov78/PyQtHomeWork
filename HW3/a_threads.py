@@ -16,6 +16,7 @@ class SystemInfo(QtCore.QThread):
         super().__init__(parent)
         self.delay = None
 
+
     def run(self) -> None:
         if self.delay is None:
             self.delay = 1
@@ -24,7 +25,9 @@ class SystemInfo(QtCore.QThread):
             cpu_value = psutil.cpu_percent(1, False)
             ram_value = psutil.virtual_memory().percent
             list_signal = [cpu_value, ram_value]
-            print(list_signal)
+            self.cpu = cpu_value
+            self.ram = ram_value
+            # print(list_signal)
             self.systemInfoReceived.emit(list_signal)
             time.sleep(self.delay)
 

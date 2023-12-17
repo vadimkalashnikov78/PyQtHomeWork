@@ -16,7 +16,9 @@ from form2 import Ui_Form
 from a_threads import SystemInfo
 
 
-class SystemInfoForm(QtWidgets.QWidget, Ui_Form, SystemInfo):
+
+
+class SystemInfoForm(QtWidgets.QWidget, Ui_Form):
     def __init__(self, parent=None):
         super().__init__(parent)
 
@@ -29,13 +31,8 @@ class SystemInfoForm(QtWidgets.QWidget, Ui_Form, SystemInfo):
 
         :return:
         """
-        self.thread = QtCore.QThread()
-        self.worker = SystemInfo()
-        self.worker.moveToThread(self.thread)
+        self.thread = SystemInfo()
         self.thread.start()
-        self.worker.start()
-
-
 
 
     def initSignals(self):
@@ -43,8 +40,7 @@ class SystemInfoForm(QtWidgets.QWidget, Ui_Form, SystemInfo):
 
         :return:
         """
-        self.worker.started.connect(self.onProgress)
-
+        self.thread.systemInfoReceived.connect(self.onProgress)
         self.lineEdit.textChanged.connect(self.onTextChanged)
 
 
@@ -55,12 +51,17 @@ class SystemInfoForm(QtWidgets.QWidget, Ui_Form, SystemInfo):
 
         :return:
         """
-        delay_new = self.lineEdit.text()
-        if isinstance(float(delay_new), float):
-            self.delay = float(delay_new)
+        if self.lineEdit.text() == "":
+            self.thread.delay = None
+            print("Время задержки >>> ", 1)
+            return
+
+        delay_new = float(self.lineEdit.text())
+        if isinstance(delay_new, float):
+            self.thread.delay = float(delay_new)
         else:
-            self.delay = 1
-        print("Время задержки изменено на >>> ", self.delay)
+            self.thread.delay = 1
+        print("Время задержки изменено на >>> ", self.thread.delay)
         pass
 
     def onProgress(self) -> None:
@@ -68,7 +69,12 @@ class SystemInfoForm(QtWidgets.QWidget, Ui_Form, SystemInfo):
 
         :return:
         """
-        print("Информация получена")
+        # print("Информация получена", self.thread.cpu, self.thread.ram)
+        self.plainTextEdit.setPlainText(str(self.thread.cpu))
+        self.plainTextEdit_2.setPlainText(str(self.thread.ram))
+
+        self.progressBar.setValue(self.thread.cpu)
+        self.progressBar_2.setValue(self.thread.ram)
         pass
 
 
