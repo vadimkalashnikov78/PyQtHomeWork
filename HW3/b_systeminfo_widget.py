@@ -11,7 +11,6 @@
 5. установку времени задержки сделать "горячей", т.е. поток должен сразу
 реагировать на изменение времени задержки
 """
-import psutil
 from PySide6 import QtWidgets, QtCore
 from form2 import Ui_Form
 from a_threads import SystemInfo
@@ -24,7 +23,6 @@ class SystemInfoForm(QtWidgets.QWidget, Ui_Form, SystemInfo):
         self.initThreads()
         self.setupUi(self)
         self.initSignals()
-        print(self.systemInfoReceived)
 
     def initThreads(self) -> None:
         """
@@ -34,6 +32,7 @@ class SystemInfoForm(QtWidgets.QWidget, Ui_Form, SystemInfo):
         self.thread = QtCore.QThread()
         self.worker = SystemInfo()
         self.worker.moveToThread(self.thread)
+        self.thread.start()
         self.worker.start()
 
 
@@ -46,23 +45,31 @@ class SystemInfoForm(QtWidgets.QWidget, Ui_Form, SystemInfo):
         """
         self.worker.started.connect(self.onProgress)
 
-        # self.lineEdit.textChanged.connect(self.onTextChanged)
+        self.lineEdit.textChanged.connect(self.onTextChanged)
 
 
     # слоты
 
-    def onTextChanged(self):
+    def onTextChanged(self) -> None:
         """
 
         :return:
         """
+        delay_new = self.lineEdit.text()
+        if isinstance(float(delay_new), float):
+            self.delay = float(delay_new)
+        else:
+            self.delay = 1
+        print("Время задержки изменено на >>> ", self.delay)
+        pass
 
-    def onProgress(self):
+    def onProgress(self) -> None:
         """
 
         :return:
         """
         print("Информация получена")
+        pass
 
 
 if __name__ == "__main__":

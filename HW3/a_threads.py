@@ -10,7 +10,7 @@ from PySide6.QtCore import Signal
 
 
 class SystemInfo(QtCore.QThread):
-    systemInfoReceived = Signal(list[float])
+    systemInfoReceived = Signal(list)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -23,8 +23,8 @@ class SystemInfo(QtCore.QThread):
         while True:
             cpu_value = psutil.cpu_percent(1, False)
             ram_value = psutil.virtual_memory().percent
-            print(cpu_value, ram_value)
             list_signal = [cpu_value, ram_value]
+            print(list_signal)
             self.systemInfoReceived.emit(list_signal)
             time.sleep(self.delay)
 
