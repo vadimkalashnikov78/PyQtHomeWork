@@ -11,17 +11,16 @@
 5. установку времени задержки сделать "горячей", т.е. поток должен сразу
 реагировать на изменение времени задержки
 """
-from PySide6 import QtWidgets, QtCore
+from PySide6 import QtWidgets
 from form2 import Ui_Form
 from a_threads import SystemInfo
-
-
 
 
 class SystemInfoForm(QtWidgets.QWidget, Ui_Form):
     def __init__(self, parent=None):
         super().__init__(parent)
 
+        self.thread = SystemInfo()
         self.initThreads()
         self.setupUi(self)
         self.initSignals()
@@ -31,9 +30,7 @@ class SystemInfoForm(QtWidgets.QWidget, Ui_Form):
 
         :return:
         """
-        self.thread = SystemInfo()
         self.thread.start()
-
 
     def initSignals(self):
         """
@@ -42,7 +39,6 @@ class SystemInfoForm(QtWidgets.QWidget, Ui_Form):
         """
         self.thread.systemInfoReceived.connect(self.onProgress)
         self.lineEdit.textChanged.connect(self.onTextChanged)
-
 
     # слоты
 

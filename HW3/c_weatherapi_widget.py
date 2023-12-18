@@ -7,20 +7,21 @@
 1. поле для ввода широты и долготы (после запуска потока они должны блокироваться)
 2. поле для ввода времени задержки (после запуска потока оно должно блокироваться)
 3. поле для вывода информации о погоде в указанных координатах
-4. поток необходимо запускать и останавливать при нажатие на кнопку
+4. поток необходимо запускать и останавливать при нажатии на кнопку
 """
-import time
-import requests
-from PySide6 import QtWidgets, QtCore
-from form_weather import Ui_FormWeather
+from PySide6 import QtWidgets
+
 from a_threads import WeatherHandler
+from form_weather import Ui_FormWeather
 
 
 class WindowWeather(QtWidgets.QWidget):
     lat = 36.826903
     lon = 10.173742
+
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.WeatherHandler = None
 
         self.ui_s = Ui_FormWeather()
         self.ui_s.setupUi(self)
@@ -42,7 +43,6 @@ class WindowWeather(QtWidgets.QWidget):
         self.ui_s.lineEditLatitude.textChanged.connect(self.stopGetData2)
         self.ui_s.lineEditLongitude.textChanged.connect(self.stopGetData2)
 
-
     def updateDelay(self):
         if self.ui_s.radioButton3.isChecked():
             self.WeatherHandler.setDelay(3)
@@ -55,6 +55,14 @@ class WindowWeather(QtWidgets.QWidget):
         # if not valLat:
         #     QtWidgets.QMessageBox.warning("")
         #     return
+        self.ui_s.lineEditLongitude.setReadOnly(True)
+        self.ui_s.lineEditLatitude.setReadOnly(True)
+        self.ui_s.lineEditLongitude.setStyleSheet("background-color: grey")
+        self.ui_s.lineEditLatitude.setStyleSheet("background-color: grey")
+
+        self.ui_s.radioButton3.setDisabled(True)
+        self.ui_s.radioButton5.setDisabled(True)
+        self.ui_s.radioButton10.setDisabled(True)
 
         WindowWeather.lat = float(self.ui_s.lineEditLatitude.text())
         WindowWeather.lon = float(self.ui_s.lineEditLongitude.text())
@@ -71,8 +79,17 @@ class WindowWeather(QtWidgets.QWidget):
 
     def stopGetData(self):
         self.WeatherHandler.setStatus(None)
+        self.ui_s.lineEditLongitude.setReadOnly(False)
+        self.ui_s.lineEditLatitude.setReadOnly(False)
+        self.ui_s.lineEditLongitude.setStyleSheet("background-color: white")
+        self.ui_s.lineEditLatitude.setStyleSheet("background-color: white")
+
         self.ui_s.pushButtonStopGetData.setEnabled(False)
         self.ui_s.pushButtonGetData.setEnabled(True)
+
+        self.ui_s.radioButton3.setDisabled(False)
+        self.ui_s.radioButton5.setDisabled(False)
+        self.ui_s.radioButton10.setDisabled(False)
 
     def stopGetData2(self):
         self.ui_s.textEditData.setText('<font color="red">Координаты изменены</font>')
@@ -92,7 +109,6 @@ class WindowWeather(QtWidgets.QWidget):
         self.ui_s.textEditData.append(f"Температура: {temperature}°C")
         self.ui_s.textEditData.append(f"Направление ветра: {winddirection}")
         self.ui_s.textEditData.append(f"Скорость ветра: {windspeed} м/c")
-
 
     # def initThreads(self):
     #     self.WeatherHandler = WeatherHandler(
@@ -116,8 +132,6 @@ class WindowWeather(QtWidgets.QWidget):
             self.ui_s.textEditData.setText('<font color="red">Введите корректные координаты</font>')
             self.stopGetData()
 
-
-
     def validateLongitude(self):
         longitude_text = self.ui_s.lineEditLongitude.text()
         try:
@@ -131,32 +145,28 @@ class WindowWeather(QtWidgets.QWidget):
             self.ui_s.lineEditLongitude.setStyleSheet("background-color: red;")
             self.ui_s.textEditData.setText('<font color="red">Введите корректные координаты</font>')
 
-class WeatherHandler(QtCore.QThread):
-    weatherInfoReceived = QtCore.Signal(dict)
-
-    def __init__(self, lat, lon, parent=None):
-        super().__init__(parent)
-
-        self.__api_url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true"
-        self.__delay = 10
-        self.__status = None
-
-    def setDelay(self, delay) -> None:
-        self.__delay = delay
-
-    def setStatus(self, val):
-        self.__status = val
-
-
-    def run(self) -> None:
-        while self.__status:
-            response = requests.get(self.__api_url)
-            data = response.json()
-            self.weatherInfoReceived.emit(data)
-            time.sleep(self.__delay)
-
-
-
+# class WeatherHandler(QtCore.QThread):
+#     weatherInfoReceived = QtCore.Signal(dict)
+#
+#     def __init__(self, lat, lon, parent=None):
+#         super().__init__(parent)
+#
+#         self.__api_url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true"
+#         self.__delay = 10
+#         self.__status = None
+#
+#     def setDelay(self, delay) -> None:
+#         self.__delay = delay
+#
+#     def setStatus(self, val):
+#         self.__status = val
+#
+#     def run(self) -> None:
+#         while self.__status:
+#             response = requests.get(self.__api_url)
+#             data = response.json()
+#             self.weatherInfoReceived.emit(data)
+#             time.sleep(self.__delay)
 
 
 if __name__ == "__main__":
