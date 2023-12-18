@@ -24,15 +24,18 @@ class Window(QtWidgets.QMainWindow):
 
     def initThreads(self) -> None:
 
+
     def initUi(self) -> None:
         self.setWindowIcon(QtGui.QIcon(""))
         self.setWindowTitle("Работа с базой данных")
+    pass
+    
 
     def initSignals(self) -> None:
 
 
 
-        #  Запуск основного приложения
+    #  Запуск основного приложения
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication()
